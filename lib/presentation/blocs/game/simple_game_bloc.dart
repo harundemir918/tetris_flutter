@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/game_state.dart';
 import '../../../domain/usecases/start_game_usecase.dart';
 import '../../../domain/usecases/move_piece_usecase.dart';
+import '../../../domain/usecases/rotate_piece_usecase.dart';
+import '../../../domain/usecases/place_piece_usecase.dart';
 import '../../../domain/repositories/game_repository.dart';
 
 /// Simplified events for the game
@@ -18,6 +20,10 @@ class MovePieceLeft extends SimpleGameEvent {}
 class MovePieceRight extends SimpleGameEvent {}
 
 class MovePieceDown extends SimpleGameEvent {}
+
+class RotatePiece extends SimpleGameEvent {}
+
+class PlacePiece extends SimpleGameEvent {}
 
 class PauseGame extends SimpleGameEvent {}
 
@@ -61,6 +67,8 @@ class GameErrorState extends SimpleGameState {
 class SimpleGameBloc extends Bloc<SimpleGameEvent, SimpleGameState> {
   final StartGameUseCase _startGameUseCase;
   final MovePieceUseCase _movePieceUseCase;
+  final RotatePieceUseCase _rotatePieceUseCase;
+  final PlacePieceUseCase _placePieceUseCase;
   final GameRepository _gameRepository;
 
   GameState? _currentGameState;
@@ -70,9 +78,13 @@ class SimpleGameBloc extends Bloc<SimpleGameEvent, SimpleGameState> {
   SimpleGameBloc({
     required StartGameUseCase startGameUseCase,
     required MovePieceUseCase movePieceUseCase,
+    required RotatePieceUseCase rotatePieceUseCase,
+    required PlacePieceUseCase placePieceUseCase,
     required GameRepository gameRepository,
   }) : _startGameUseCase = startGameUseCase,
        _movePieceUseCase = movePieceUseCase,
+       _rotatePieceUseCase = rotatePieceUseCase,
+       _placePieceUseCase = placePieceUseCase,
        _gameRepository = gameRepository,
        super(GameInitialState()) {
     on<InitializeGame>(_onInitializeGame);
@@ -80,6 +92,8 @@ class SimpleGameBloc extends Bloc<SimpleGameEvent, SimpleGameState> {
     on<MovePieceLeft>(_onMovePieceLeft);
     on<MovePieceRight>(_onMovePieceRight);
     on<MovePieceDown>(_onMovePieceDown);
+    on<RotatePiece>(_onRotatePiece);
+    on<PlacePiece>(_onPlacePiece);
     on<PauseGame>(_onPauseGame);
     on<ResumeGame>(_onResumeGame);
 
@@ -175,7 +189,80 @@ class SimpleGameBloc extends Bloc<SimpleGameEvent, SimpleGameState> {
         ),
       );
     } catch (e) {
-      // Ignore movement errors
+      // If piece can't move down, place it and spawn new piece
+      if (direction == MoveDirection.down) {
+        add(PlacePiece());
+      }
+    }
+  }
+
+  Future<void> _onRotatePiece(
+    RotatePiece event,
+    Emitter<SimpleGameState> emit,
+  ) async {
+    if (_currentGameState == null ||
+        _currentGameState!.status != GameStatus.playing) {
+      return;
+    }
+
+    try {
+      final gameState = await _rotatePieceUseCase.call(
+        RotatePieceParams(
+          currentState: _currentGameState!,
+          direction: RotationDirection.clockwise,
+        ),
+      );
+
+      _currentGameState = gameState;
+
+      emit(
+        GamePlayingState(
+          gameState: _currentGameState!,
+          settings: _gameSettings,
+        ),
+      );
+    } catch (e) {
+      // Ignore rotation errors (piece can't rotate)
+    }
+  }
+
+  Future<void> _onPlacePiece(
+    PlacePiece event,
+    Emitter<SimpleGameState> emit,
+  ) async {
+    if (_currentGameState == null ||
+        _currentGameState!.status != GameStatus.playing) {
+      return;
+    }
+
+    try {
+      final gameState = await _placePieceUseCase.call(
+        PlacePieceParams(currentState: _currentGameState!),
+      );
+
+      _currentGameState = gameState;
+
+      print('DEBUG: After placing piece in BLoC:');
+      print('  Current piece: ${gameState.currentPiece?.type}');
+      print('  Next piece: ${gameState.nextPiece?.type}');
+      print('  Game status: ${gameState.status}');
+      print('  Piece bag length: ${gameState.pieceBag.length}');
+
+      // Check if game is over
+      if (gameState.isGameOver) {
+        emit(GameErrorState(message: 'Game Over'));
+        return;
+      }
+
+      emit(
+        GamePlayingState(
+          gameState: _currentGameState!,
+          settings: _gameSettings,
+        ),
+      );
+    } catch (e) {
+      // Handle game over or other placement errors
+      emit(GameErrorState(message: 'Game Over'));
     }
   }
 

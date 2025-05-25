@@ -26,7 +26,7 @@ class GameControlsWidget extends StatelessWidget {
                 icon: Icons.rotate_left,
                 label: 'Rotate',
                 onPressed: () {
-                  // TODO: Add rotation when implemented
+                  context.read<SimpleGameBloc>().add(RotatePiece());
                 },
               ),
               _buildControlButton(

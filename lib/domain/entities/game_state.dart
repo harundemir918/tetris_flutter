@@ -284,6 +284,15 @@ class GameState extends Equatable {
   GameState _spawnNextPiece() {
     if (nextPiece == null) return this;
 
+    // Check if the next piece can be placed at spawn position
+    if (!board.canPlaceTetromino(nextPiece!)) {
+      // Game over - can't spawn new piece
+      print(
+        'DEBUG: Cannot spawn next piece ${nextPiece!.type} at position ${nextPiece!.position}',
+      );
+      return copyWith(clearCurrentPiece: true).endGame();
+    }
+
     List<String> newBag = List.from(pieceBag);
     Tetromino? newNext;
 
@@ -295,6 +304,10 @@ class GameState extends Equatable {
       newNext = Tetromino.spawn(newBag.removeAt(0));
     }
 
+    print(
+      'DEBUG: Successfully spawning piece ${nextPiece!.type} as current, next will be ${newNext?.type}',
+    );
+
     return copyWith(
       currentPiece: nextPiece,
       nextPiece: newNext,
@@ -305,22 +318,29 @@ class GameState extends Equatable {
 
   /// Helper method to place piece and handle line clearing
   GameState _placePieceAndContinue(GameBoard newBoard, Score currentScore) {
+    print('DEBUG: Placing piece and continuing...');
+
     // Clear complete lines
     final clearResult = newBoard.clearCompleteLines();
     final finalBoard = clearResult.board;
     final linesCleared = clearResult.linesCleared;
 
+    print('DEBUG: Lines cleared: $linesCleared');
+
     // Update score with cleared lines
     final newScore = currentScore.addLinesCleared(linesCleared);
 
-    // Check for game over
-    if (finalBoard.isGameOver()) {
-      return copyWith(
-        board: finalBoard,
-        score: newScore,
-        clearCurrentPiece: true,
-      ).endGame();
-    }
+    // Check for game over - temporarily disabled to debug
+    // if (finalBoard.isGameOver()) {
+    //   print('DEBUG: Game over detected by board.isGameOver()');
+    //   return copyWith(
+    //     board: finalBoard,
+    //     score: newScore,
+    //     clearCurrentPiece: true,
+    //   ).endGame();
+    // }
+
+    print('DEBUG: Board is not game over, spawning next piece...');
 
     // Spawn next piece
     final nextState = _spawnNextPiece();

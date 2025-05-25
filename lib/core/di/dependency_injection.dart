@@ -138,6 +138,8 @@ Future<void> _registerBlocs() async {
     () => SimpleGameBloc(
       startGameUseCase: getIt(),
       movePieceUseCase: getIt(),
+      rotatePieceUseCase: getIt(),
+      placePieceUseCase: getIt(),
       gameRepository: getIt(),
     ),
   );

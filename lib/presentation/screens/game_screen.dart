@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/di/dependency_injection.dart';
+import '../../domain/entities/tetromino.dart';
 import '../blocs/game/simple_game_bloc.dart';
 import '../widgets/game_board_widget.dart';
 import '../widgets/game_controls_widget.dart';
@@ -17,6 +18,49 @@ class GameScreen extends StatelessWidget {
       create: (context) => DI.get<SimpleGameBloc>(),
       child: const GameScreenView(),
     );
+  }
+}
+
+/// Custom painter for next piece preview
+class NextPiecePainter extends CustomPainter {
+  final Tetromino tetromino;
+
+  NextPiecePainter(this.tetromino);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final shape = tetromino.shape;
+    final cellSize = size.width / 4; // Assume 4x4 grid for preview
+    final colorValue = tetromino.getColor();
+
+    for (int row = 0; row < shape.length; row++) {
+      for (int col = 0; col < shape[row].length; col++) {
+        if (shape[row][col] == 1) {
+          final rect = Rect.fromLTWH(
+            col * cellSize,
+            row * cellSize,
+            cellSize,
+            cellSize,
+          );
+
+          // Fill the cell
+          final fillPaint = Paint()..color = Color(colorValue);
+          canvas.drawRect(rect, fillPaint);
+
+          // Draw border
+          final borderPaint = Paint()
+            ..color = Colors.white30
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1;
+          canvas.drawRect(rect, borderPaint);
+        }
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(NextPiecePainter oldDelegate) {
+    return oldDelegate.tetromino != tetromino;
   }
 }
 
@@ -163,28 +207,35 @@ class GameScreenView extends StatelessWidget {
                                   border: Border.all(color: Colors.white),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Column(
+                                child: Column(
                                   children: [
-                                    Text(
+                                    const Text(
                                       'Next',
                                       style: TextStyle(
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                    SizedBox(height: 8),
-                                    // TODO: Add next piece preview
+                                    const SizedBox(height: 8),
+                                    // Next piece preview
                                     SizedBox(
                                       height: 60,
-                                      child: Center(
-                                        child: Text(
-                                          '?',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 24,
-                                          ),
-                                        ),
-                                      ),
+                                      child: gameState.nextPiece != null
+                                          ? CustomPaint(
+                                              painter: NextPiecePainter(
+                                                gameState.nextPiece!,
+                                              ),
+                                              size: Size(60, 60),
+                                            )
+                                          : Center(
+                                              child: Text(
+                                                '?',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 24,
+                                                ),
+                                              ),
+                                            ),
                                     ),
                                   ],
                                 ),
