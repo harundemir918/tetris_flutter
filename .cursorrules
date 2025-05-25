@@ -1,0 +1,56 @@
+# Tetris Flutter - Project Intelligence
+
+## Architecture Patterns
+- **Clean Architecture**: Strict layer separation (Domain -> Data -> Presentation)
+- **BLoC Pattern**: Multiple specialized BLoCs for different concerns
+- **Repository Pattern**: Abstract interfaces in domain, implementations in data
+- **Use Case Pattern**: Single responsibility business logic operations
+- **Dependency Injection**: get_it service locator pattern
+
+## Key Implementation Decisions
+- **State Management**: Multiple BLoCs (GameBloc, BoardBloc, ScoreBloc, PieceBloc)
+- **Game Loop**: Timer-based approach for piece falling
+- **Testing Strategy**: TDD for domain layer, widget tests for UI
+- **Project Structure**: Clear folder hierarchy following Clean Architecture
+
+## Development Workflow
+1. **Always start with domain layer** - entities and use cases first
+2. **Test-driven development** for business logic
+3. **Keep UI layer thin** - delegate logic to BLoCs
+4. **Maintain strict layer boundaries** - no domain dependencies on outer layers
+
+## Code Organization Principles
+- **Single Responsibility**: Each class has one clear purpose
+- **Dependency Inversion**: Depend on abstractions, not concretions
+- **Interface Segregation**: Small, focused interfaces
+- **Open/Closed**: Open for extension, closed for modification
+
+## Tetris-Specific Patterns
+- **Tetromino Representation**: Use matrix/list representation for piece shapes
+- **Collision Detection**: Check before movement, not after
+- **Line Clearing**: Separate algorithm from board update
+- **Score Calculation**: Based on lines cleared and drop bonus
+
+## Performance Considerations
+- **Efficient Redraws**: Only update changed board sections
+- **Object Pooling**: Reuse tetromino instances
+- **State Immutability**: Prevent unnecessary widget rebuilds
+- **Input Responsiveness**: Immediate UI feedback, async processing
+
+## Testing Approaches
+- **Entity Tests**: Focus on business rules and validation
+- **Use Case Tests**: Mock repositories, test business logic flow
+- **BLoC Tests**: Event/state transitions with bloc_test
+- **Widget Tests**: User interaction and state-driven UI updates
+
+## Common Pitfalls to Avoid
+- **Don't put business logic in widgets**
+- **Don't make domain layer depend on external frameworks**
+- **Don't skip testing for game mechanics**
+- **Don't over-engineer the initial implementation**
+
+## Memory Bank Usage
+- **Always read memory bank first** when starting work
+- **Update activeContext.md** when switching focus areas
+- **Update progress.md** after completing features
+- **Reference systemPatterns.md** for architecture decisions 
