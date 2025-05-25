@@ -43,6 +43,9 @@ dependencies:
   
   # Utilities
   equatable: ^2.0.7
+  
+  # Data Persistence
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_test:
