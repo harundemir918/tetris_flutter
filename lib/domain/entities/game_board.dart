@@ -213,10 +213,22 @@ class GameBoard extends Equatable {
 
   /// Creates a copy of this board with optional modifications
   GameBoard copyWith({List<List<String?>>? cells, int? width, int? height}) {
+    final newWidth = width ?? this.width;
+    final newHeight = height ?? this.height;
+
+    // If dimensions changed and no cells provided, create new empty cells
+    if (cells == null && (newWidth != this.width || newHeight != this.height)) {
+      return GameBoard(
+        cells: List.generate(newHeight, (_) => List.filled(newWidth, null)),
+        width: newWidth,
+        height: newHeight,
+      );
+    }
+
     return GameBoard(
       cells: cells ?? _deepCopyCells(),
-      width: width ?? this.width,
-      height: height ?? this.height,
+      width: newWidth,
+      height: newHeight,
     );
   }
 
