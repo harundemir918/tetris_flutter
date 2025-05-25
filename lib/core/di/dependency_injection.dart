@@ -22,6 +22,9 @@ import '../../data/datasources/local_score_data_source.dart';
 import '../../data/repositories/game_repository_impl.dart';
 import '../../data/repositories/score_repository_impl.dart';
 
+// Presentation layer imports
+import '../../presentation/blocs/game/simple_game_bloc.dart';
+
 /// Dependency injection container for Tetris game
 /// Handles registration and retrieval of dependencies following Clean Architecture
 final GetIt getIt = GetIt.instance;
@@ -130,11 +133,14 @@ Future<void> _registerUseCases() async {
 
 /// Registers BLoC dependencies
 Future<void> _registerBlocs() async {
-  // BLoCs will be registered here as factories (new instance each time)
-  // Example:
-  // getIt.registerFactory<GameBloc>(
-  //   () => GameBloc(getIt()),
-  // );
+  // Register BLoCs as factories (new instance each time)
+  getIt.registerFactory<SimpleGameBloc>(
+    () => SimpleGameBloc(
+      startGameUseCase: getIt(),
+      movePieceUseCase: getIt(),
+      gameRepository: getIt(),
+    ),
+  );
 }
 
 /// Clears all registered dependencies
