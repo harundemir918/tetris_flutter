@@ -1,30 +1,36 @@
 # Active Context: Tetris Flutter
 
 ## Current Status
-**Project Phase**: Initial Setup & Planning
-**Last Updated**: Project Initialization
-**Focus Area**: Memory Bank Creation & Architecture Planning
+**Project Phase**: Phase 2 - Domain Layer Development
+**Last Updated**: Phase 1 Complete
+**Focus Area**: Core Game Entities & Business Logic
 
 ## Current Work Focus
 
 ### Immediate Goals
-1. **Memory Bank Initialization**: ✅ Complete
-   - Project brief established
-   - Product context defined
-   - System patterns documented
-   - Technical context outlined
+1. **Phase 1 Foundation**: ✅ Complete
+   - Memory bank established
+   - Clean Architecture structure created
+   - Dependencies configured and installed
+   - Core utilities implemented
+   - Position and Tetromino entities with full test coverage
 
-2. **Next Phase**: Project Structure Setup
-   - Set up Clean Architecture folder structure
-   - Configure dependencies in pubspec.yaml
-   - Implement dependency injection setup
-   - Create base classes and interfaces
+2. **Phase 2 Current**: Domain Layer Completion
+   - GameBoard entity with collision detection
+   - Score entity for points/level tracking
+   - Game state entities (playing, paused, game over)
+   - Repository interfaces
+   - Core use cases (MovePiece, RotatePiece, ClearLines)
 
 ## Recent Changes
-- ✅ Created complete memory bank documentation
-- ✅ Defined Clean Architecture patterns
-- ✅ Established BLoC state management approach
-- ✅ Outlined dependency injection strategy
+- ✅ Phase 1 Foundation Setup completed
+- ✅ Dependencies installed (flutter_bloc, get_it, equatable, testing packages)
+- ✅ Clean Architecture folder structure created
+- ✅ Core utilities: GameConstants, GameUtils, GameExceptions, DI setup
+- ✅ Position entity with 27 passing tests
+- ✅ Tetromino entity with 33 passing tests
+- ✅ Fixed linting issues (angle brackets, library directive)
+- ✅ All 61 tests passing, zero linting issues
 
 ## Current Decisions & Considerations
 
